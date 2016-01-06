@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><div>
+  <h4> Images for keyword: {{ image_name }}</h4>
+  <!-- Table -->
+  <table class="table">
+   <tr>
+    <th>Name</th>
+    <th>Description</th> 
+    <th>Official</th>
+    <th>Automated</th>
+    <th>Star Count</th>
+    <th>Pull</th>
+  </tr>
+  {% for row in range(count) %}
+  	<tr>
+  <td>{{ payload[row]['name'] }}</td>
+ 	<td>{{ payload[row]['description']|truncate(50) }}</td>
+ 	<td>{{ payload[row]['is_official'] }}</td>
+ 	<td>{{ payload[row]['is_automated'] }}</td>
+  <td>{{ payload[row]['star_count'] }}</td>
+  <td>
+    
+     <a href="/action?object=images&id={{ payload[row]['name'] }}:latest&action=pull" class="btn btn-info" role="button">Pull Now</a>
+  
+  </td>
+  </tr>	
+  {% endfor %}
+  </table>
+</div>
+{% endblock %}

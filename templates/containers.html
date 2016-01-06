@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Single button -->
+<div class="btn-group">
+  <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+   {% if notify == None %} Filter {% else %} {{ notify }} {% endif %} <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="/containers?stats=running">Running</a></li>
+    <li><a href="/containers?stats=all">All</a></li>
+  </ul>
+</div>
+<li role="separator" class="divider"></li>
+{% if alert ==  204 %}
+<div class="alert alert-success" role="alert"> Success </div>
+{% elif alert == 304 %}
+<div class="alert alert-info" role="alert"> No action </div>
+{% elif alert == 500 %}
+<div class="alert alert-danger" role="alert"> Server Error</div>
+{% endif %}
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><div>
+  <h4> Containers</h4>
+  <table class="table">
+   <tr>
+    <th>ID</th>
+    <th>Image</th> 
+    <th>Command</th>
+    <th>Ports</th>
+    <th>Created</th> 
+    <th>Status</th>
+    <th>Action</th>
+  </tr>
+  {% for row in range(count) %}
+  	<tr>
+    <td>{{ payload[row]['Id']|truncate(15,True,'')  }} </td>
+ 	<td>{{ payload[row]['Image'] }}</td>
+ 	<td>{{ payload[row]['Command'] }}</td>
+ 	<td>{% 	for j in range(payload[row]['Ports']|length) %}
+		 {% if payload[row]['Ports'][j]|length == 4 %}
+			{{ payload[row]['Ports'][j]['PrivatePort'] }} -> {{ payload[row]['Ports'][j]['PublicPort'] }}
+			<br>
+		 {% else %}
+			 {{ payload[row]['Ports'][j]['PrivatePort'] }}
+			<br>
+		{% endif %}
+		{% endfor %}
+ 	</td>
+ 	<td>{{ payload[row]['Created'] }}</td>
+ 	<td>{{ payload[row]['Status'] }}</td>
+ 	<td>
+ 		<div class="btn-group">
+  		<button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    	Action <span class="caret"></span>
+ 		 </button>
+  		<ul class="dropdown-menu">
+  	
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=start">Start</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=stop">Stop</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=restart">Retart</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=kill">Kill</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=pause">Pause</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=unpause">UnPause</a></li>
+    	<li><a href="/action?object=containers&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=remove">Remove</a></li>
+
+  		</ul>
+		</div>
+ 	</td>
+  </tr>	
+  {% endfor %}
+  </table>
+</div>
+{% endblock %}

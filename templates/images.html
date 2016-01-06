@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+ <h4> Download Image from Docker Hub </h4>
+<form method ='POST'>
+<div class="row">
+<div class="col-lg-6">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="Search for..." name='image_name'>
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="submit">Search!</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+  </div>
+</form>
+<div>
+   <li role="separator" class="divider"></li>
+</div>
+
+{% if alert ==  200 %}
+<div class="alert alert-success" role="alert"> Success </div>
+{% elif alert == 500 %}
+<div class="alert alert-danger" role="alert"> Server Error</div>
+{% endif %}
+
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading"><div>
+  <h4> Images in Local </h4>
+  <!-- Table -->
+  <table class="table">
+   <tr>
+    <th>ID</th>
+    <th>Tags</th> 
+    <th>Created</th>
+    <th>Size</th>
+    <th>Action</th>
+  </tr>
+  {% for row in range(count) %}
+  	<tr>
+    <td>{{ payload[row]['Id']|truncate(15,True,'')  }}</td>
+ 	<td>{{ payload[row]['RepoTags'][0] }}</td>
+ 	<td>{{ payload[row]['Created'] }}</td>
+ 	<td>{{ payload[row]['VirtualSize']|filesizeformat }} </td>
+  <td> 
+  <div class="btn-group">
+      <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Action <span class="caret"></span>
+     </button>
+      <ul class="dropdown-menu">
+    
+      <li><a href="/action?id={{ payload[row]['Id']|truncate(15,True,'') }}&action=start">Run</a></li>
+
+     <li><a href="/action?object=images&id={{ payload[row]['Id']|truncate(15,True,'') }}&action=remove">Remove</a></li>
+      </ul>
+    </div>
+  </td>
+  </tr>	
+  {% endfor %}
+  </table>
+</div>
+{% endblock %}
