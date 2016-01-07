@@ -121,23 +121,39 @@ def index():
 ## list containers	
 @app.route("/containers")
 def containers():
-	try:
-		db = get_db()
-		conn_db = db.execute('select id,host,port from hosts order by id asc')
-		list_host = conn_db.fetchall()
-		db.close()
-		#print list_host
-	except: 
-		error = 'DATABASE Error'
-		return  render_template("containers.html",payload = payload,count = count,notify = request.args.get('stats'), alert = None)
-	for row in list_host:
-		if request.args.get('stats') == 'running':
-			payload = json.loads(get_api('/containers/json','GET').read(),host = row[1],port= row[2])
-			count = len(payload)
-		else:
-			payload = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = row[1],port= row[2]).read())
-			count = len(payload)
-	return render_template("containers.html",payload = payload,count = count,notify = request.args.get('stats'), alert = None)
+	containers = []
+	list_containers = {}
+	list_containers['host'] = None
+	list_containers['port'] = None
+	list_containers['list_containers'] = []
+	list_containers['node-name'] = None
+	#id_host = request.args.get('id')
+	if True:
+		try:
+			db = get_db()
+			conn_db = db.execute('select id,host,port from hosts order by id asc')
+			list_host = conn_db.fetchall()
+			print list_host
+			db.close()
+			#print list_host
+		except: 
+			error = 'DATABASE Error'
+			print error
+			return  redirect(url_for('containers'))
+		for row in list_host:
+			list_containers['host'] = row[1]
+			list_containers['port'] = row[2]
+			list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=row[1],port=row[2]).read())['Name']
+			if request.args.get('stats') == 'running':
+
+				list_containers['list_containers'] = json.loads(get_api('/containers/json','GET').read(),host = row[1],port= row[2])
+				#count = len(list_containers)
+				containers.append(list_containers.copy())
+			else:
+				list_containers['list_containers'] = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = row[1],port= row[2]).read())
+				containers.append(list_containers.copy())
+	count = len(containers)
+	return render_template("containers.html",containers = containers,count = count,notify = request.args.get('stats'), alert = None)
 
 
 ##define action in containers and images	
@@ -187,7 +203,7 @@ def images():
 		error = 'DATABASE Error'
 		return  render_template("containers.html",payload = payload,count = count,notify = request.args.get('stats'), alert = None)
 	for row in list_host:
-		payload_image = json.loads(get_api(path='/images/json',method='GET').read())
+		payload_image = json.loads(get_api(path='/images/json',method='GET',host = row[1],port = row[2]).read())
 		count = len(payload_image)
 		if request.method =='POST':		
 			return redirect(url_for('search',image_name_search = request.form['image_name']))
