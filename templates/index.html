@@ -7,7 +7,7 @@
 <div class="panel panel-default">
   <div class="panel-body">
    <div class="col-xs-6 col-md-3">
-    <a href="/containers?stats=running" class="thumbnail">
+    <a href="/containers/host-id={{ item['id'] }}?stats=running" class="thumbnail">
       <img src="static/container-running.png" alt="Running Containers" width="100" height="100">
     </a>
     <div class="caption">
@@ -17,7 +17,7 @@
    
   </div>
   <div class="col-xs-6 col-md-3">
-      <a href="/containers" class="thumbnail">
+      <a href="/containers/{{ item['id'] }}" class="thumbnail">
       <img src="static/all-container.png" alt="All Containers" width="100" height="100">
     </a>
      <div class="caption">
@@ -26,7 +26,7 @@
     </div>
     </div>
    <div class="col-xs-6 col-md-3">
-   <a href="/images" class="thumbnail">
+   <a href="/images/{{ item['id'] }}" class="thumbnail">
       <img src="static/docker-images.png" alt="Images" width="100" height="100">
     </a>
      <div class="caption">

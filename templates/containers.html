@@ -5,6 +5,7 @@
 <div class="btn-group">
   <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
    {% if notify == None %} Filter {% else %} {{ notify }} {% endif %} <span class="caret"></span>
+
   </button>
   <ul class="dropdown-menu">
     <li><a href="/containers?stats=running">Running</a></li>
@@ -76,4 +77,5 @@
   </table>
 </div>
 {% endfor %}
+
 {% endblock %}

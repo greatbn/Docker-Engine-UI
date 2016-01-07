@@ -1,5 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
+   {% if error != 'None' %}
+   <div class="alert alert-danger" role="alert"> Server Error</div>
+   {% else %}
  <h4> Download Image from Docker Hub </h4>
 <form method ='POST'>
 <div class="row">
@@ -59,4 +62,5 @@
   {% endfor %}
   </table>
 </div>
+{% endif %}
 {% endblock %}

@@ -191,23 +191,28 @@ def remove():
 
 ##  list images
 
-@app.route("/images",methods = ['GET','POST'])
-def images():
+@app.route("/images/<host_id>",methods = ['GET','POST'])
+def images(host_id):
+	error = None
 	try:
 		db = get_db()
-		conn_db = db.execute('select id,host,port from hosts order by id asc')
-		list_host = conn_db.fetchall()
+		query = 'select id,host,port from hosts where id = '+host_id
+		conn_db = db.execute(query)
+		host = conn_db.fetchall()
 		db.close()
 		#print list_host
 	except: 
 		error = 'DATABASE Error'
-		return  render_template("containers.html",payload = payload,count = count,notify = request.args.get('stats'), alert = None)
-	for row in list_host:
-		payload_image = json.loads(get_api(path='/images/json',method='GET',host = row[1],port = row[2]).read())
+		return render_template("images.html",error = error)
+	try:	
+		payload_image = json.loads(get_api(path='/images/json',method='GET',host = host[1],port = host[2]).read())
 		count = len(payload_image)
-		if request.method =='POST':		
+	except:
+		error = "Docker Host error"
+		return render_template("images.html",error = error)
+	if request.method =='POST':		
 			return redirect(url_for('search',image_name_search = request.form['image_name']))
-	return render_template("images.html",payload = payload_image,count = count)
+	return render_template("images.html",payload = payload_image,count = count,error= error)
 
 ## search image
 @app.route("/search/<image_name_search>")
