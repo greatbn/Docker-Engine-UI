@@ -7,12 +7,12 @@
 <div class="panel panel-default">
   <div class="panel-body">
    <div class="col-xs-6 col-md-3">
-    <a href="/containers/host-id={{ item['id'] }}?stats=running" class="thumbnail">
+    <a href="/containers/{{ item['id'] }}?stats=running" class="thumbnail">
       <img src="static/container-running.png" alt="Running Containers" width="100" height="100">
     </a>
     <div class="caption">
     	<h3> Running Containers</h3>
-    	<h5> Running: {{ item['cout_run'] }}</h5>
+    	<h5> Running: {{ item['count_run'] }}</h5>
     </div>
    
   </div>

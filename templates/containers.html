@@ -61,13 +61,13 @@
      </button>
       <ul class="dropdown-menu">
     
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=start">Start</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=stop">Stop</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=restart">Retart</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=kill">Kill</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=pause">Pause</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=unpause">UnPause</a></li>
-      <li><a href="/action?host={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=remove">Remove</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=start">Start</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=stop">Stop</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=restart">Retart</a></li>
+      <li><a href="/action?host_={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=kill">Kill</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=pause">Pause</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=unpause">UnPause</a></li>
+      <li><a href="/action?host_id={{ containers[row]['id'] }}&object=containers&id={{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'') }}&action=remove">Remove</a></li>
 
       </ul>
     </div>

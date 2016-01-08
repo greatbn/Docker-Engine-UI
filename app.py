@@ -12,14 +12,21 @@ DATABASE = './hosts.db'
 app.config.from_object(__name__)
 
 
-## effect with restfull api
+### connect db
+
 def connect_db():
 	return sqlite3.connect(app.config['DATABASE'])
-def get_db():
-	if not hasattr(g,'sqlite_db'):
-		g.sqlite_db = connect_db()
-	return g.sqlite_db
 
+@app.before_request
+def before_request():
+	g.db  = connect_db()
+
+@app.teardown_request
+def teardown_request(exception):
+	db = getattr(g,'db',None)
+	if db is not None:
+		db.close
+## effect with restfull api
 def get_api(path,method,host,port):
 	g = httplib.HTTPConnection(host,port)
 	headers = {"Content-type":"application/json"}
@@ -47,10 +54,8 @@ def index():
 	info['cpu'] = None
 	info['status'] = None
 	try:
-		db = get_db()
-		conn_db = db.execute('select id,host,port from hosts order by id asc')
+		conn_db = g.db.execute('select id,host,port from hosts order by id asc')
 		list_host = conn_db.fetchall()
-		db.close()
 		#print list_host
 	except: 
 		error = 'DATABASE Error'
@@ -108,7 +113,6 @@ def index():
 			error  = 'Please type correct'
 			return render_template("index.html",all_info = all_info,error = error)
 					
-	#return all_info[0]		
 	return render_template("index.html",all_info = all_info,error = error)
 
 ## list containers	
@@ -121,48 +125,85 @@ def containers():
 	list_containers['list_containers'] = []
 	list_containers['node-name'] = None
 	#id_host = request.args.get('id')
-	if True:
-		try:
-			db = get_db()
-			conn_db = db.execute('select id,host,port from hosts order by id asc')
-			list_host = conn_db.fetchall()
-			print list_host
-			db.close()
-			#print list_host
-		except: 
-			error = 'DATABASE Error'
-			print error
-			return  redirect(url_for('containers'))
-		for row in list_host:
-			list_containers['id'] = row[0]
-			list_containers['host'] = row[1]
-			list_containers['port'] = row[2]
-			list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=row[1],port=row[2]).read())['Name']
-			if request.args.get('stats') == 'running':
+	try:
+		query = "select id,host,port from hosts order by id asc"
+		conn_db = g.db.execute(query)
+		list_host = conn_db.fetchall()
+	except: 
+		error = 'DATABASE Error'
+		return  render_template("containers.html",error = error,notify = request.args.get('stats'), alert = None)
+	for row in list_host:
+		list_containers['id'] = row[0]
+		list_containers['host'] = row[1]
+		list_containers['port'] = row[2]
+		list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=row[1],port=row[2]).read())['Name']
+		if request.args.get('stats') == 'running':
 
-				list_containers['list_containers'] = json.loads(get_api('/containers/json','GET').read(),host = row[1],port= row[2])
+			list_containers['list_containers'] = json.loads(get_api('/containers/json','GET').read(),host = row[1],port= row[2])
 				#count = len(list_containers)
-				containers.append(list_containers.copy())
-			else:
-				list_containers['list_containers'] = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = row[1],port= row[2]).read())
-				containers.append(list_containers.copy())
-	count = len(containers)
+			containers.append(list_containers.copy())
+		else:
+			list_containers['list_containers'] = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = row[1],port= row[2]).read())
+			containers.append(list_containers.copy())
 	return render_template("containers.html",containers = containers,notify = request.args.get('stats'), alert = None)
+
+
+@app.route("/containers/<host_id>")
+def containers_in_hosts(host_id):
+	containers = []
+	list_containers = {}
+	list_containers['host'] = None
+	list_containers['port'] = None
+	list_containers['list_containers'] = []
+	list_containers['node-name'] = None
+	#id_host = request.args.get('id')
+	try:
+		query = "select id,host,port from hosts where id = "+ host_id
+		conn_db = g.db.execute(query)
+		host = conn_db.fetchall()
+		print host
+	except: 
+		error = 'DATABASE Error'
+		return  render_template("containers.html",error = error,notify = request.args.get('stats'), alert = None)
+	list_containers['id'] = host[0][0]
+	list_containers['host'] = host[0][1]
+	list_containers['port'] = host[0][2]
+	list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=host[0][1],port=host[0][2]).read())['Name']
+	if request.args.get('stats') == 'running':
+
+		list_containers['list_containers'] = json.loads(get_api('/containers/json','GET',host = host[0][1],port= host[0][2]).read())
+				#count = len(list_containers)
+		containers.append(list_containers.copy())
+	else:
+		list_containers['list_containers'] = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = host[0][1],port= host[0][2]).read())
+		containers.append(list_containers.copy())
+	return render_template("containers.html",containers = containers,notify = request.args.get('stats'), alert = None)
+
 
 
 ##define action in containers and images	
 @app.route("/action")
 def action():
+	host_id = request.args.get('host_id')
 	id_con = request.args.get('id')
 	action =  request.args.get('action')
 	object_effect = request.args.get('object')
+	try:
+		query = 'select id,host,port from hosts where id = '+host_id
+		conn_db = g.db.execute(query)
+		host = conn_db.fetchall()
+		
+	except: 
+		error = 'DATABASE Error'
+		return render_template(object_effect+".html",error = error)
+
 	if object_effect=='images' and action == 'pull':
-		alert = get_api(path='/images/create?fromImage='+id_con,method='POST').status
+		alert = get_api(path='/images/create?fromImage='+id_con,method='POST',host = host[0][1],port = host[0][2]).status
 	elif action == 'remove':
-		alert = get_api(path='/'+object_effect+'/'+id_con,method='DELETE').status
+		alert = get_api(path='/'+object_effect+'/'+id_con,method='DELETE',host = host[0][1],port = host[0][2]).status
 	else:
-		alert = get_api(path= '/'+object_effect+'/'+id_con+'/'+action,method = 'POST').status
-	payload = json.loads(get_api('/'+object_effect+'/json','GET').read())
+		alert = get_api(path= '/'+object_effect+'/'+id_con+'/'+action,method = 'POST',host = host[0][1],port = host[0][2]).status
+	payload = json.loads(get_api('/'+object_effect+'/json','GET',host = host[0][1],port = host[0][2]).read())
 	count = len(payload)
 	return render_template(object_effect+".html",payload = payload,count = count,notify = request.args.get('stats'), alert = alert )
 
@@ -172,10 +213,9 @@ def remove():
 	id = int(request.args.get('id'))
 
 	try:
-		query = "delete from hosts where id=%d" %id
-		conn = get_db()				
-		conn.execute(query)		
-		conn.commit()
+		query = "delete from hosts where id=%d" %id			
+		g.db.execute(query)		
+		g.db.commit()
 		#conn.close()
 		return redirect(url_for('index'))
 	except:
@@ -190,30 +230,36 @@ def remove():
 def images(host_id):
 	error = None
 	try:
-		db = get_db()
 		query = 'select id,host,port from hosts where id = '+host_id
-		conn_db = db.execute(query)
+		conn_db = g.db.execute(query)
 		host = conn_db.fetchall()
-		db.close()
-		#print list_host
 	except: 
 		error = 'DATABASE Error'
 		return render_template("images.html",error = error)
 	try:	
-		payload_image = json.loads(get_api(path='/images/json',method='GET',host = host[1],port = host[2]).read())
+		payload_image = json.loads(get_api(path='/images/json',method='GET',host = host[0][1],port = host[0][2]).read())
 		count = len(payload_image)
 	except:
 		error = "Docker Host error"
 		return render_template("images.html",error = error)
-	if request.method =='POST':		
-			return redirect(url_for('search',image_name_search = request.form['image_name']))
-	return render_template("images.html",payload = payload_image,count = count,error= error)
+	if request.method =='POST':	
+		return redirect(url_for('search',host_id = host_id ,image_name_search = request.form['image_name']))
+	return render_template("images.html",payload = payload_image,error= error,host_id = host_id)
 
 ## search image
-@app.route("/search/<image_name_search>")
-def search(image_name_search):
-	payload_image_search = json.loads(get_api(path='/images/search?term='+image_name_search,method = 'GET').read())
-	count = len(payload_image_search)
-	return render_template("image_search.html",payload = payload_image_search , count = count,image_name = image_name_search)
+@app.route("/search/<host_id>/<image_name_search>")
+def search(host_id,image_name_search):
+	error = None
+	try:
+		query = 'select id,host,port from hosts where id = '+host_id
+		conn_db = g.db.execute(query)
+		host = conn_db.fetchall()
+	except: 
+		error = 'DATABASE Error'
+		return render_template("images.html",error = error)
+	payload_image_search = json.loads(get_api(path='/images/search?term='+image_name_search,method = 'GET',host= host[0][1],port = host[0][2]).read())
+	
+	return render_template("image_search.html",payload = payload_image_search , image_name = image_name_search,host_id = host_id)
+
 if __name__ == '__main__':
 	app.run(host ='0.0.0.0',debug = True)

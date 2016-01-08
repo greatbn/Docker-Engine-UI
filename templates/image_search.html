@@ -14,7 +14,7 @@
     <th>Star Count</th>
     <th>Pull</th>
   </tr>
-  {% for row in range(count) %}
+  {% for row in range(payload|length) %}
   	<tr>
   <td>{{ payload[row]['name'] }}</td>
  	<td>{{ payload[row]['description']|truncate(50) }}</td>
@@ -23,7 +23,7 @@
   <td>{{ payload[row]['star_count'] }}</td>
   <td>
     
-     <a href="/action?object=images&id={{ payload[row]['name'] }}:latest&action=pull" class="btn btn-info" role="button">Pull Now</a>
+     <a href="/action?object=images&host_id={{ host_id }}&id={{ payload[row]['name'] }}:latest&action=pull" class="btn btn-info" role="button">Pull Now</a>
   
   </td>
   </tr>	
