@@ -27,13 +27,6 @@ def get_api(path,method,host,port):
 	response = g.getresponse()
 	
 	return response
-@app.route("/settings",methods = ['GET','POST'])
-def settings():
-	if request.method =='POST':
-		host = request.form['host']
-		port = request.port['port']
-		return redirect(url_for("index"))
-	return render_template("settings.html")
 
 ## index show total containers, images on host
 
@@ -141,6 +134,7 @@ def containers():
 			print error
 			return  redirect(url_for('containers'))
 		for row in list_host:
+			list_containers['id'] = row[0]
 			list_containers['host'] = row[1]
 			list_containers['port'] = row[2]
 			list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=row[1],port=row[2]).read())['Name']
@@ -153,7 +147,7 @@ def containers():
 				list_containers['list_containers'] = json.loads(get_api(path= '/containers/json?all=1',method = 'GET',host = row[1],port= row[2]).read())
 				containers.append(list_containers.copy())
 	count = len(containers)
-	return render_template("containers.html",containers = containers,count = count,notify = request.args.get('stats'), alert = None)
+	return render_template("containers.html",containers = containers,notify = request.args.get('stats'), alert = None)
 
 
 ##define action in containers and images	
@@ -189,7 +183,8 @@ def remove():
 		return render_template('index.html',error = error)
 
 
-##  list images
+
+##  list images from host
 
 @app.route("/images/<host_id>",methods = ['GET','POST'])
 def images(host_id):
