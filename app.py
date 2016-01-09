@@ -56,7 +56,7 @@ def index():
 	try:
 		conn_db = g.db.execute('select id,host,port from hosts order by id asc')
 		list_host = conn_db.fetchall()
-		#print list_host
+		
 	except: 
 		error = 'DATABASE Error'
 		return render_template("index.html",all_info = all_info,error = error)
@@ -90,16 +90,14 @@ def index():
 	if request.method=='POST':
 		new_host = request.form['host']
 		new_port = request.form['port']
-		print new_host
-		print new_port
 		if new_host != '' and new_port != '':			
 				if get_api(path='/info',method='GET',host= new_host,port = int(new_port)).status == 200:					
 					try:
 						conn = sqlite3.connect("./hosts.db")
 						query = "insert into hosts(host,port) values('%s',%d)" %(new_host,int(new_port))
-						print query
+						
 						conn.execute(query)
-						print 'ok'
+						
 						conn.commit()
 						conn.close()
 						return redirect(url_for("index"))
@@ -161,7 +159,7 @@ def containers_in_hosts(host_id):
 		query = "select id,host,port from hosts where id = "+ host_id
 		conn_db = g.db.execute(query)
 		host = conn_db.fetchall()
-		print host
+		
 	except: 
 		error = 'DATABASE Error'
 		return  render_template("containers.html",error = error,notify = request.args.get('stats'), alert = None)
@@ -205,7 +203,11 @@ def action():
 		alert = get_api(path= '/'+object_effect+'/'+id_con+'/'+action,method = 'POST',host = host[0][1],port = host[0][2]).status
 	payload = json.loads(get_api('/'+object_effect+'/json','GET',host = host[0][1],port = host[0][2]).read())
 	count = len(payload)
-	return render_template(object_effect+".html",payload = payload,count = count,notify = request.args.get('stats'), alert = alert )
+	if object_effect =='images':
+		return redirect(url_for('images',host_id = host_id))
+	elif object_effect == 'containers':
+		return redirect(url_for('containers_in_hosts',host_id = host_id))
+
 
 #remove host
 @app.route('/remove')
