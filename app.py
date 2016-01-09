@@ -139,7 +139,7 @@ def containers():
 		list_containers['node-name'] = json.loads(get_api(path='/info',method = 'GET',host=row[1],port=row[2]).read())['Name']
 		if request.args.get('stats') == 'running':
 
-			list_containers['list_containers'] = json.loads(get_api('/containers/json','GET').read(),host = row[1],port= row[2])
+			list_containers['list_containers'] = json.loads(get_api('/containers/json','GET',host = row[1],port= row[2]).read())
 				#count = len(list_containers)
 			containers.append(list_containers.copy())
 		else:
@@ -260,6 +260,21 @@ def search(host_id,image_name_search):
 	payload_image_search = json.loads(get_api(path='/images/search?term='+image_name_search,method = 'GET',host= host[0][1],port = host[0][2]).read())
 	
 	return render_template("image_search.html",payload = payload_image_search , image_name = image_name_search,host_id = host_id)
+
+#info host
+
+@app.route("/info/<host_id>")
+def info(host_id):
+	error = None
+	try:
+		query = 'select id,host,port from hosts where id = '+host_id
+		conn_db = g.db.execute(query)
+		host = conn_db.fetchall()
+	except: 
+		error = 'DATABASE Error'
+		return render_template("index.html",error = error)
+	payload_info = json.loads(get_api(path='/info',method = 'GET',host=host[0][1],port = host[0][2]).read())
+	return render_template("info.html",payload = payload_info)
 
 if __name__ == '__main__':
 	app.run(host ='0.0.0.0',debug = True)

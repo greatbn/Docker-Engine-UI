@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="panel panel-default">
+  <!-- Default panel contents -->
+  <div class="panel-heading">Docker Host Info</div>
+
+  <!-- Table -->
+  <table class="table">
+    <tr>
+    	<td>Containers:</td>
+    	<td> {{ payload['Containers'] }}</td>
+    </tr>
+    <tr> 
+    <td> Images:</td>
+    <td> {{ payload['Images'] }}</td>
+    </tr>
+    <tr>
+    	<td>Server Version:</td>
+    	<td>{{ payload['ServerVersion'] }}</td>
+    </tr>
+    <tr>
+    	<td>Storage Driver:</td>
+    	<td>{{ payload['Driver'] }}</td>
+    </tr>
+    <tr>
+    	<td>Root Dir:</td>
+    	<td>{{ payload['DriverStatus'][0][1] }}</td>
+    </tr>
+    <tr>
+    	<td>Backing Filesystem:</td>
+    	<td>{{ payload['DriverStatus'][1][1] }}</td>
+    </tr>
+    <tr>
+    	<td>Dirs:</td>
+    	<td>{{ payload['DriverStatus'][2][1] }}</td>
+    </tr>
+    <tr>
+    	<td>Dirperm1 Supported:</td>
+    	<td>{{ payload['DriverStatus'][3][1] }}</td>
+    </tr>
+    <tr>
+    	<td>Execution Driver:</td>
+    	<td>{{ payload['ExecutionDriver'] }}</td>
+    </tr>
+    <tr>
+    	<td>Logging Driver:</td>
+    	<td>{{ payload['LoggingDriver'] }}</td>
+    </tr>
+    <tr>
+    	<td>Kernel Version:</td>
+    	<td>{{ payload['KernelVersion'] }}</td>
+    </tr>
+    <tr>
+    	<td>Operating System:</td>
+    	<td>{{ payload['OperatingSystem'] }}</td>
+    </tr>
+    <tr>
+    	<td>CPUs:</td>
+    	<td>{{ payload['NCPU'] }}</td>
+    </tr>
+    <tr>
+    	<td>Total Memory:</td>
+    	<td>{{ payload['MemTotal']|filesizeformat }}</td>
+    </tr>
+    <tr>
+    	<td>Name:</td>
+    	<td>{{ payload['Name'] }}</td>
+    </tr>
+    <tr>
+    	<td>ID: </td>
+    	<td>{{ payload['ID'] }}</td>
+    </tr>
+    <tr>
+    	<td>MemoryLimit:</td>
+    	<td>{{ payload['MemoryLimit'] }}</td>
+    </tr>
+     <tr>
+    	<td>Memory Limit:</td>
+    	<td>{{ payload['MemoryLimit'] }}</td>
+    </tr>
+     <tr>
+    	<td>Swap Limit:</td>
+    	<td>{{ payload['SwapLimit'] }}</td>
+    </tr>
+     <tr>
+    	<td>Cpu Cfs Period:</td>
+    	<td>{{ payload['CpuCfsPeriod'] }}</td>
+    </tr>
+     <tr>
+    	<td>Cpu Cfs Quota:</td>
+    	<td>{{ payload['CpuCfsQuota'] }}</td>
+    </tr>
+      <tr>
+    	<td>IPv4 Forwarding:</td>
+    	<td>{{ payload['IPv4Forwarding'] }}</td>
+    </tr>
+      <tr>
+    	<td>BridgeNfIptables:</td>
+    	<td>{{ payload['BridgeNfIptables'] }}</td>
+    </tr>
+      <tr>
+    	<td>BridgeNfIp6tables:</td>
+    	<td>{{ payload['BridgeNfIp6tables'] }}</td>
+    </tr>
+      <tr>
+    	<td>Debug:</td>
+    	<td>{{ payload['Debug'] }}</td>
+    </tr>
+      <tr>
+    	<td>SystemTime:</td>
+    	<td>{{ payload['SystemTime'] }}</td>
+    </tr>
+  </table>
+</div>
+{% endblock %}
