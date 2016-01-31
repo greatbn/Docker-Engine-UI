@@ -2,6 +2,7 @@ from flask import Flask,render_template,session,request,flash,g,redirect,url_for
 from flask.ext.bootstrap import Bootstrap
 import sqlite3
 import httplib, json,urllib
+import os
 app = Flask(__name__)
 Bootstrap(app)
 
@@ -279,4 +280,5 @@ def info(host_id):
 	return render_template("info.html",payload = payload_info)
 
 if __name__ == '__main__':
-	app.run(host ='0.0.0.0',debug = True)
+	port = int(os.environ.get("PORT", 5000))
+	app.run(host ='0.0.0.0',port=port,debug = True)
