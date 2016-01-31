@@ -39,9 +39,9 @@
   <tr>
 
     <td>{{ containers[row]['list_containers'][i]['Id']|truncate(15,True,'')  }} </td>
-  <td>{{ containers[row]['list_containers'][i]['Image'] }}</td>
-  <td>{{ containers[row]['list_containers'][i]['Command'] }}</td>
-  <td>{%  for j in range(containers[row]['list_containers'][i]['Ports']|length) %}
+    <td>{{ containers[row]['list_containers'][i]['Image'] }}</td>
+    <td>{{ containers[row]['list_containers'][i]['Command'] }}</td>
+    <td>{%  for j in range(containers[row]['list_containers'][i]['Ports']|length) %}
      {% if containers[row]['list_containers'][i]['Ports'][j]|length == 4 %}
       {{ containers[row]['list_containers'][i]['Ports'][j]['PrivatePort'] }} -> {{ containers[row]['list_containers'][i]['Ports'][j]['PublicPort'] }}
       <br>

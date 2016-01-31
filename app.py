@@ -279,4 +279,4 @@ def info(host_id):
 	return render_template("info.html",payload = payload_info)
 
 if __name__ == '__main__':
-	app.run(host ='0.0.0.0',debug = True)
+	app.run(host ='0.0.0.0',port=2000,debug = True)
